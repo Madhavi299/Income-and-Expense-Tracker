@@ -1,5 +1,12 @@
 
+import sys
+from pathlib import Path
+
 import streamlit as st
+
+repository_root = str(Path(__file__).resolve().parent.parent)
+if repository_root not in sys.path:
+    sys.path.insert(0, repository_root)
 
 from frontend.api_client import APIError, login, register
 
