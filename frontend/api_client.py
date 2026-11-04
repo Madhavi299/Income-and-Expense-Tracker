@@ -43,6 +43,9 @@ def register(username, email, password):
 def login(email, password):
     return _request("POST", "/auth/login", json={"email": email, "password": password})
 
+def current_user(token):
+    return _request("GET", "/auth/me", token=token)
+
 def list_transactions(token):
     return _request("GET", "/transactions", token=token)
 
@@ -57,3 +60,22 @@ def delete_transaction(token, transaction_id):
 
 def extract_bill(token, uploaded_file):
     return _request("POST", "/bills/extract", token=token, files={"file": (uploaded_file.name, uploaded_file.getvalue(), uploaded_file.type or "application/octet-stream")})
+
+def list_admin_users(token, limit=500, offset=0):
+    return _request(
+        "GET",
+        "/admin/users",
+        token=token,
+        params={"limit": limit, "offset": offset},
+    )
+
+def update_admin_user(token, user_id, data):
+    return _request("PATCH", f"/admin/users/{user_id}", token=token, json=data)
+
+def list_activity(token, limit=200):
+    return _request(
+        "GET",
+        "/admin/activity",
+        token=token,
+        params={"limit": limit},
+    )

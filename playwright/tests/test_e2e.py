@@ -3,6 +3,21 @@ from uuid import uuid4
 from playwright.sync_api import expect
 
 
+def test_logged_out_visitors_only_see_login_page(browser_page, e2e_services):
+    page = browser_page
+    page.goto(
+        f"{e2e_services['frontend_url']}/admin",
+        wait_until="domcontentloaded",
+    )
+
+    expect(page.get_by_role("tab", name="Login")).to_be_visible()
+    expect(page.locator("input[aria-label='Email']:visible")).to_be_visible()
+    expect(page.get_by_role("link", name="admin", exact=True)).to_have_count(0)
+    expect(
+        page.get_by_role("link", name="add transaction", exact=True)
+    ).to_have_count(0)
+
+
 def test_add_dashboard_view_and_manage_transactions(
     browser_page, e2e_services, capture_page
 ):

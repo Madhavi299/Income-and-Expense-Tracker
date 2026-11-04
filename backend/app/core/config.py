@@ -9,4 +9,10 @@ if DATABASE_URL.startswith(("postgres://", "postgresql://")):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 SECRET_KEY = os.getenv("SECRET_KEY", "development-only-change-me")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))
+INITIAL_ADMIN_EMAIL = os.getenv("INITIAL_ADMIN_EMAIL", "").strip().lower()
+INITIAL_ADMIN_PASSWORD = os.getenv("INITIAL_ADMIN_PASSWORD", "")
+INITIAL_ADMIN_USERNAME = os.getenv("INITIAL_ADMIN_USERNAME", "admin").strip()
+INITIAL_ADMIN_PROMOTE_EXISTING = os.getenv(
+    "INITIAL_ADMIN_PROMOTE_EXISTING", ""
+).strip().lower() in {"1", "true", "yes", "on"}
 ALGORITHM = "HS256"

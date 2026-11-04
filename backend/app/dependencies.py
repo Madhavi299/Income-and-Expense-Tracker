@@ -22,4 +22,16 @@ def get_current_user(
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         raise HTTPException(status_code=401, detail="User account not found")
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="This account is deactivated")
+    return user
+
+def get_current_admin(user: User = Depends(get_current_user)):
+    if user.role != "admin":
+        raise HTTPException(status_code=403, detail="Administrator access required")
+    return user
+
+def get_current_regular_user(user: User = Depends(get_current_user)):
+    if user.role != "user":
+        raise HTTPException(status_code=403, detail="A user account is required")
     return user

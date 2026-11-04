@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, datetime
+from typing import Literal
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 class RegisterRequest(BaseModel):
@@ -14,7 +15,26 @@ class UserResponse(BaseModel):
     id: int
     username: str
     email: str
+    role: Literal["user", "admin"]
+    is_active: bool
     model_config = ConfigDict(from_attributes=True)
+
+class AdminUserResponse(UserResponse):
+    created_at: datetime
+
+class AdminUserUpdate(BaseModel):
+    role: Literal["user", "admin"] | None = None
+    is_active: bool | None = None
+
+class ActivityResponse(BaseModel):
+    id: int
+    actor_user_id: int | None
+    actor_username: str | None
+    target_user_id: int | None
+    target_username: str | None
+    action: str
+    details: str | None
+    created_at: datetime
 
 class TokenResponse(BaseModel):
     access_token: str

@@ -7,6 +7,22 @@ CREATE TABLE IF NOT EXISTS public.users (
     username VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'admin')),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE public.users
+    ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'user';
+ALTER TABLE public.users
+    ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE;
+
+CREATE TABLE IF NOT EXISTS public.activity_logs (
+    id SERIAL PRIMARY KEY,
+    actor_user_id INTEGER REFERENCES public.users(id) ON DELETE SET NULL,
+    target_user_id INTEGER REFERENCES public.users(id) ON DELETE SET NULL,
+    action VARCHAR(80) NOT NULL,
+    details VARCHAR(255),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -28,3 +44,6 @@ CREATE INDEX IF NOT EXISTS idx_transactions_user_id
 
 CREATE INDEX IF NOT EXISTS idx_transactions_user_date
     ON public.transactions(user_id, transaction_date DESC);
+
+CREATE INDEX IF NOT EXISTS idx_activity_logs_created_at
+    ON public.activity_logs(created_at DESC);

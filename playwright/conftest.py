@@ -44,7 +44,7 @@ os.environ["SECRET_KEY"] = secrets.token_urlsafe(32)
 from backend.app import models  # noqa: E402,F401
 from backend.app.db.database import Base, SessionLocal, engine  # noqa: E402
 from backend.app.main import app  # noqa: E402
-from backend.app.models import Transaction, User  # noqa: E402
+from backend.app.models import ActivityLog, Transaction, User  # noqa: E402
 
 
 def _artifact_name(nodeid: str, stage: str) -> str:
@@ -219,6 +219,7 @@ def capture_page(request: pytest.FixtureRequest, browser_page: Page):
 def client():
     with TestClient(app) as test_client:
         with SessionLocal() as db:
+            db.query(ActivityLog).delete()
             db.query(Transaction).delete()
             db.query(User).delete()
             db.commit()

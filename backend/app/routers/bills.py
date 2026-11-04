@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
+from backend.app.activity import record_activity
 from backend.app.db.database import get_db
-from backend.app.dependencies import get_current_user
+from backend.app.dependencies import get_current_regular_user
 from backend.app.models import User
 from backend.app.ocr import extract_text, guess_fields
 
@@ -9,8 +10,7 @@ router = APIRouter(prefix="/bills", tags=["Bill OCR"])
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 @router.post("/extract")
-async def extract_bill(file: UploadFile = File(...), user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    del user, db  # Auth is required; extraction itself does not write to the database.
+async def extract_bill(file: UploadFile = File(...), user: User = Depends(get_current_regular_user), db: Session = Depends(get_db)):
     content = await file.read()
     if not content:
         raise HTTPException(status_code=400, detail="The uploaded file is empty")
@@ -24,4 +24,6 @@ async def extract_bill(file: UploadFile = File(...), user: User = Depends(get_cu
         raise HTTPException(status_code=400, detail=f"Could not read this bill. Check OCR setup. Details: {exc}")
     if not text.strip():
         raise HTTPException(status_code=422, detail="No readable text found. Try a clearer image or a text-based PDF.")
+    record_activity(db, "bill_ocr_extracted", actor_user_id=user.id, target_user_id=user.id)
+    db.commit()
     return {"extracted_text": text, "fields": guess_fields(text)}

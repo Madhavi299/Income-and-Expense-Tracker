@@ -7,6 +7,7 @@ This is a separate project. It does not modify your existing tracker.
 - Passwords hashed using PBKDF2 (Python standard library)
 - JWT authentication for the FastAPI backend
 - Each user can see and manage only their own transactions
+- Role-based access for regular users and administrators, including account activation controls and activity monitoring
 - Dashboard, add transaction, view transactions, and manage transactions pages
 - Upload an image/PDF bill, extract text, detect likely amount/date/merchant/category, review the fields, then save to the database
 - PostgreSQL supported; SQLite is the default for a simple first run
@@ -22,6 +23,16 @@ pip install -r requirements.txt
 
 ## 2. Configure environment
 Copy `.env.example` to `.env` and set a unique `SECRET_KEY`.
+To bootstrap the first administrator, also set `INITIAL_ADMIN_EMAIL` and a
+strong `INITIAL_ADMIN_PASSWORD` before starting the backend. The backend creates
+that admin only when the email and username are unused; it never promotes an
+existing user or resets the password of an already bootstrapped account.
+On startup, existing databases are migrated with `role` and `is_active`
+columns; existing accounts remain active regular users.
+If the email belongs to an account you control and you want to make that
+account the first admin, set `INITIAL_ADMIN_PROMOTE_EXISTING=true` for one
+startup. The account must be active and keeps its existing password; this
+setting does not reset passwords. Set it back to `false` after the promotion.
 For the easiest first run, keep the SQLite DATABASE_URL in `.env.example`.
 For PostgreSQL, set DATABASE_URL to your PostgreSQL connection string, for example:
 `postgresql+psycopg://postgres:YOUR_PASSWORD@localhost:5432/expense_tracker`
@@ -67,7 +78,9 @@ cloud filesystem for real user data.
    connection string. Keep it private.
 3. In Render, create a Blueprint from the GitHub repository and deploy the
    `expense-tracker-api` service. When prompted, set `DATABASE_URL` to the
-   PostgreSQL connection string. Render generates `SECRET_KEY` for the API.
+   PostgreSQL connection string and provide `INITIAL_ADMIN_EMAIL` and a unique,
+   strong `INITIAL_ADMIN_PASSWORD` for the first administrator. Render generates
+   `SECRET_KEY` for the API.
    The deployed API health check is its root URL; it should return a JSON
    message that the API is running.
 4. In Streamlit Community Cloud, create an app from the same repository and
@@ -80,6 +93,14 @@ cloud filesystem for real user data.
 
    Save the secret and reboot the Streamlit app. For local use, `API_BASE_URL`
    can instead be set in `.env`.
+
+Administrators use the same login form as regular users and are routed to the
+Admin Console. It supports paginated account viewing, role assignment,
+activation/deactivation, and a recent activity feed. If the bootstrap email
+already belongs to a regular account, startup fails instead of granting
+administrator access; choose a fresh email or promote that account manually
+through a trusted database session. Keep the bootstrap password private and do
+not commit it to GitHub.
 
 The free Render service may sleep when idle, so the first API request after a
 period of inactivity can take longer. Use a persistent managed database and

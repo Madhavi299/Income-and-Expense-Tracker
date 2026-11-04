@@ -145,15 +145,46 @@ def logout():
 
 def app_screen():
 
-    from frontend.pages.dashboard import page as dashboard_page
-
-    from frontend.pages.add_transaction import page as add_page
-
-    from frontend.pages.view_transactions import page as view_page
-
-    from frontend.pages.manage_transactions import page as manage_page
-
     user = st.session_state.user or {}
+
+    if user.get("role") == "admin":
+        from frontend.pages.admin import page as admin_page
+        pages = [
+            st.Page(
+                admin_page,
+                title="Admin Console",
+                url_path="admin",
+                default=True,
+            )
+        ]
+    else:
+        from frontend.pages.dashboard import page as dashboard_page
+        from frontend.pages.add_transaction import page as add_page
+        from frontend.pages.view_transactions import page as view_page
+        from frontend.pages.manage_transactions import page as manage_page
+        pages = [
+            st.Page(
+                dashboard_page,
+                title="Dashboard",
+                url_path="dashboard",
+                default=True,
+            ),
+            st.Page(
+                add_page,
+                title="Add Transaction",
+                url_path="add-transaction",
+            ),
+            st.Page(
+                view_page,
+                title="View Transactions",
+                url_path="view-transactions",
+            ),
+            st.Page(
+                manage_page,
+                title="Manage Transactions",
+                url_path="manage-transactions",
+            ),
+        ]
 
     # SIDEBAR BRANDING
     with st.sidebar:
@@ -173,36 +204,6 @@ def app_screen():
 
             logout()
 
-    # TOP NAVIGATION + URL ROUTING
-    pages = [
-
-        st.Page(
-            dashboard_page,
-            title="Dashboard",
-            url_path="dashboard",
-            default=True
-        ),
-
-        st.Page(
-            add_page,
-            title="Add Transaction",
-            url_path="add-transaction"
-        ),
-
-        st.Page(
-            view_page,
-            title="View Transactions",
-            url_path="view-transactions"
-        ),
-
-        st.Page(
-            manage_page,
-            title="Manage Transactions",
-            url_path="manage-transactions"
-        ),
-
-    ]
-
     navigation = st.navigation(
         pages,
         position="sidebar"
@@ -219,7 +220,18 @@ init_state()
 
 if not st.session_state.token:
 
-    auth_screen()
+    navigation = st.navigation(
+        [
+            st.Page(
+                auth_screen,
+                title="Login",
+                url_path="login",
+                default=True,
+            )
+        ],
+        position="hidden",
+    )
+    navigation.run()
 
 else:
 
