@@ -109,7 +109,7 @@ def page():
         )
         income_expense_chart = (
             alt.Chart(income_expense)
-            .mark_arc(innerRadius=76, outerRadius=126, cornerRadius=5, padAngle=0.025)
+            .mark_arc(innerRadius=66, outerRadius=108, cornerRadius=5, padAngle=0.025)
             .encode(
                 theta=alt.Theta("Amount:Q", stack=True),
                 color=alt.Color(
@@ -135,7 +135,7 @@ def page():
                 ],
             )
             .add_params(income_hover)
-            .properties(height=300)
+            .properties(height=340, padding={"top": 24, "bottom": 24, "left": 16, "right": 16})
             .configure(background="transparent")
             .configure_view(stroke=None)
             .configure_legend(
@@ -158,7 +158,7 @@ def page():
         )
         category_chart = (
             alt.Chart(expense_categories)
-            .mark_arc(innerRadius=76, outerRadius=126, cornerRadius=5, padAngle=0.025)
+            .mark_arc(innerRadius=66, outerRadius=108, cornerRadius=5, padAngle=0.025)
             .encode(
                 theta=alt.Theta("Amount:Q"),
                 color=alt.Color(
@@ -181,7 +181,7 @@ def page():
                 ],
             )
             .add_params(category_hover)
-            .properties(height=300)
+            .properties(height=340, padding={"top": 24, "bottom": 24, "left": 16, "right": 16})
             .configure(background="transparent")
             .configure_view(stroke=None)
             .configure_legend(
