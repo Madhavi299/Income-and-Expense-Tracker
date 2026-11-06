@@ -50,15 +50,28 @@ def render_theme_control():
         [data-testid="stMarkdownContainer"] li,
         [data-testid="stMetricLabel"],
         [data-testid="stMetricValue"],
-        label {{
-            color: {colors["foreground"]};
+        [data-testid="stMarkdownContainer"] strong,
+        [data-testid="stMarkdownContainer"] b,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] label,
+        label,
+        h1, h2, h3, h4, h5, h6 {{
+            color: {colors["foreground"]} !important;
         }}
-        h1, h2, h3 {{
-            color: {colors["foreground"]};
+        [data-testid="stAppViewContainer"] [data-testid="stMarkdownContainer"] h1,
+        [data-testid="stAppViewContainer"] [data-testid="stMarkdownContainer"] h2,
+        [data-testid="stAppViewContainer"] [data-testid="stMarkdownContainer"] h3,
+        [data-testid="stAppViewContainer"] [data-testid="stMarkdownContainer"] h4,
+        [data-testid="stAppViewContainer"] [data-testid="stMarkdownContainer"] h5,
+        [data-testid="stAppViewContainer"] [data-testid="stMarkdownContainer"] h6 {{
+            color: {colors["foreground"]} !important;
+            -webkit-text-fill-color: {colors["foreground"]} !important;
+        }}
+        h1, h2, h3, h4, h5, h6 {{
             letter-spacing: -0.035em;
         }}
         [data-testid="stCaptionContainer"] {{
-            color: {colors["muted"]};
+            color: {colors["muted"]} !important;
         }}
         div[data-testid="stMetric"] {{
             background: linear-gradient(145deg, {colors["surface"]}, {colors["background"]});
@@ -81,9 +94,17 @@ def render_theme_control():
         [data-testid="stNumberInput"] input,
         [data-testid="stTextArea"] textarea {{
             background-color: {colors["input_background"]};
-            color: {colors["foreground"]};
+            color: {colors["foreground"]} !important;
+            -webkit-text-fill-color: {colors["foreground"]} !important;
             border-color: {colors["border"]};
             border-radius: 10px;
+        }}
+        [data-testid="stTextInput"] input::placeholder,
+        [data-testid="stNumberInput"] input::placeholder,
+        [data-testid="stTextArea"] textarea::placeholder {{
+            color: {colors["muted"]} !important;
+            -webkit-text-fill-color: {colors["muted"]} !important;
+            opacity: 1;
         }}
         .stButton > button,
         .stDownloadButton > button,
@@ -122,7 +143,7 @@ def render_theme_control():
         }}
         [data-testid="stRadio"] label,
         [data-testid="stCheckbox"] label {{
-            color: {colors["foreground"]};
+            color: {colors["foreground"]} !important;
         }}
         [data-testid="stDataFrame"] {{
             border: 1px solid {colors["border"]};

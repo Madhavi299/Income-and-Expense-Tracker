@@ -78,14 +78,14 @@ def page():
 
     chart_text = "#e6edf3" if st.session_state.get("dark_mode") else "#1f2937"
     chart_colors = [
-        "#4f46e5",
+        "#7c3aed",
         "#06b6d4",
         "#f97316",
         "#ec4899",
-        "#14b8a6",
+        "#10b981",
         "#eab308",
-        "#8b5cf6",
-        "#64748b",
+        "#3b82f6",
+        "#ef4444",
     ]
     income_expense = pd.DataFrame(
         [
@@ -102,7 +102,11 @@ def page():
 
     st.subheader("Spending insights")
     chart_columns = st.columns(2)
+    chart_columns[0].markdown("#### Income vs. expenses")
     if not income_expense.empty:
+        income_hover = alt.selection_point(
+            on="pointerover", fields=["Type"], empty=True
+        )
         income_expense_chart = (
             alt.Chart(income_expense)
             .mark_arc(innerRadius=76, outerRadius=126, cornerRadius=5, padAngle=0.025)
@@ -111,20 +115,35 @@ def page():
                 color=alt.Color(
                     "Type:N",
                     scale=alt.Scale(
-                        domain=["Income", "Expense"], range=["#10b981", "#f97316"]
+                        domain=["Income", "Expense"],
+                        range=["#00c9a7", "#ff6b6b"],
                     ),
-                    legend=alt.Legend(title=None, orient="bottom"),
+                    legend=alt.Legend(
+                        title="Transaction type",
+                        orient="bottom",
+                        labelFontSize=14,
+                        titleFontSize=13,
+                        labelLimit=240,
+                    ),
+                ),
+                opacity=alt.condition(
+                    income_hover, alt.value(1), alt.value(0.35)
                 ),
                 tooltip=[
                     "Type:N",
                     alt.Tooltip("Amount:Q", title="Amount", format=",.2f"),
                 ],
             )
-            .properties(height=300, title="Income vs. expenses")
+            .add_params(income_hover)
+            .properties(height=300)
             .configure(background="transparent")
             .configure_view(stroke=None)
-            .configure_title(color=chart_text, anchor="start", fontSize=15)
-            .configure_legend(labelColor=chart_text, labelFontSize=12)
+            .configure_legend(
+                labelColor=chart_text,
+                titleColor=chart_text,
+                labelFontSize=14,
+                titleFontSize=13,
+            )
         )
         chart_columns[0].altair_chart(
             income_expense_chart, use_container_width=True, theme="streamlit"
@@ -132,7 +151,11 @@ def page():
     else:
         chart_columns[0].info("No income or expenses match these filters.")
 
+    chart_columns[1].markdown("#### Expenses by category")
     if not expense_categories.empty:
+        category_hover = alt.selection_point(
+            on="pointerover", fields=["Category"], empty=True
+        )
         category_chart = (
             alt.Chart(expense_categories)
             .mark_arc(innerRadius=76, outerRadius=126, cornerRadius=5, padAngle=0.025)
@@ -141,18 +164,32 @@ def page():
                 color=alt.Color(
                     "Category:N",
                     scale=alt.Scale(range=chart_colors),
-                    legend=alt.Legend(title=None, orient="bottom"),
+                    legend=alt.Legend(
+                        title="Expense category",
+                        orient="bottom",
+                        labelFontSize=14,
+                        titleFontSize=13,
+                        labelLimit=240,
+                    ),
+                ),
+                opacity=alt.condition(
+                    category_hover, alt.value(1), alt.value(0.35)
                 ),
                 tooltip=[
                     "Category:N",
                     alt.Tooltip("Amount:Q", title="Spent", format=",.2f"),
                 ],
             )
-            .properties(height=300, title="Where your money goes")
+            .add_params(category_hover)
+            .properties(height=300)
             .configure(background="transparent")
             .configure_view(stroke=None)
-            .configure_title(color=chart_text, anchor="start", fontSize=15)
-            .configure_legend(labelColor=chart_text, labelFontSize=12)
+            .configure_legend(
+                labelColor=chart_text,
+                titleColor=chart_text,
+                labelFontSize=14,
+                titleFontSize=13,
+            )
         )
         chart_columns[1].altair_chart(category_chart, use_container_width=True)
     else:
@@ -173,7 +210,10 @@ def page():
             y=alt.Y("Amount:Q", title="Amount (₹)", axis=alt.Axis(format="~s")),
             color=alt.Color(
                 "Type:N",
-                scale=alt.Scale(domain=["Income", "Expense"], range=["#10b981", "#f97316"]),
+                scale=alt.Scale(
+                    domain=["Income", "Expense"],
+                    range=["#00c9a7", "#ff6b6b"],
+                ),
                 legend=alt.Legend(title=None, orient="top"),
             ),
             opacity=alt.condition(trend_selection, alt.value(1), alt.value(0.15)),

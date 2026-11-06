@@ -37,14 +37,20 @@ def page():
     st.caption("Keep your records up to date, or let a bill image do the data entry.")
     token = st.session_state.token
 
+    st.markdown("#### Choose how to add a record")
     manual_tab, bill_tab = st.tabs(["✍️  Enter details", "🧾  Scan a bill"])
     with manual_tab:
         with st.container(border=True):
             st.markdown("#### Transaction details")
-            st.caption("Fields marked by the form are saved to your private account.")
+            st.caption(
+                "Record money coming in or going out. You can edit these details later."
+            )
             with st.form("manual_transaction_form"):
                 kind = st.selectbox("Transaction type", ["Expense", "Income"])
-                title = st.text_input("Title", placeholder="e.g. Monthly salary")
+                title = st.text_input(
+                    "Title",
+                    placeholder="e.g. Monthly salary or groceries",
+                )
                 columns = st.columns(2)
                 amount = columns[0].number_input(
                     "Amount (₹)", min_value=0.01, step=100.0, format="%.2f"
@@ -63,16 +69,17 @@ def page():
                 st.error("Please enter a title.")
             else:
                 try:
-                    _save_transaction(
-                        token,
-                        title,
-                        amount,
-                        kind,
-                        category,
-                        tx_date,
-                        description,
-                        "manual",
-                    )
+                    with st.spinner("Saving transaction…"):
+                        _save_transaction(
+                            token,
+                            title,
+                            amount,
+                            kind,
+                            category,
+                            tx_date,
+                            description,
+                            "manual",
+                        )
                     st.success("Transaction saved to the database.")
                     st.toast("Your transaction has been added.", icon="✅")
                 except APIError as exc:
@@ -82,13 +89,17 @@ def page():
         with st.container(border=True):
             st.markdown("#### Turn a bill into a transaction")
             st.caption(
-                "Upload a clear image or PDF. Review every extracted field before saving."
+                "Upload a clear image or PDF. We’ll suggest details for you to review."
             )
             uploaded = st.file_uploader(
-                "Choose a bill",
+                "Choose a bill image or PDF",
                 type=["pdf", "png", "jpg", "jpeg", "webp", "bmp", "tif", "tiff"],
                 key="bill_upload",
             )
+            if uploaded is not None:
+                st.caption(
+                    f"Selected: {uploaded.name} · {uploaded.size / 1024:.0f} KB"
+                )
             if st.button(
                 "Extract bill details",
                 disabled=uploaded is None,
