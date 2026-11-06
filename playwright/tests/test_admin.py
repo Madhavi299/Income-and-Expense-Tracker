@@ -106,6 +106,42 @@ def test_admin_manages_users_and_deactivated_user_loses_access(client):
     assert "login_blocked_inactive" in actions
 
 
+def test_admin_user_list_shows_only_transaction_totals(client):
+    admin = _register(client, "totals_admin", "totals-admin@example.com")
+    target = _register(client, "totals_user", "totals-user@example.com")
+    _promote(admin["id"])
+    admin_token = _login(client, admin["email"])
+    target_token = _login(client, target["email"])
+
+    for transaction_type, amount, title in (
+        ("Income", 1200, "salary"),
+        ("Expense", 450, "groceries"),
+    ):
+        response = client.post(
+            "/transactions",
+            headers=_headers(target_token),
+            json={
+                "title": title,
+                "amount": amount,
+                "transaction_type": transaction_type,
+                "transaction_date": "2026-11-06",
+            },
+        )
+        assert response.status_code == 201
+
+    listed = client.get("/admin/users", headers=_headers(admin_token))
+    assert listed.status_code == 200
+    target_summary = next(
+        user for user in listed.json() if user["id"] == target["id"]
+    )
+    assert target_summary["total_income"] == 1200
+    assert target_summary["total_expenses"] == 450
+    assert target_summary["balance"] == 750
+    assert "transactions" not in target_summary
+    assert "title" not in target_summary
+    assert "transaction_type" not in target_summary
+
+
 def test_admin_cannot_modify_own_access_and_demoted_admin_loses_access(client):
     first_admin = _register(client, "first_admin", "first-admin@example.com")
     second_admin = _register(client, "second_admin", "second-admin@example.com")

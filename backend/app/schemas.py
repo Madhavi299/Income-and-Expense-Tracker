@@ -22,6 +22,11 @@ class UserResponse(BaseModel):
 class AdminUserResponse(UserResponse):
     created_at: datetime
 
+class AdminUserSummary(AdminUserResponse):
+    total_income: float
+    total_expenses: float
+    balance: float
+
 class AdminUserUpdate(BaseModel):
     role: Literal["user", "admin"] | None = None
     is_active: bool | None = None

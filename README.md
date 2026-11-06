@@ -96,8 +96,9 @@ cloud filesystem for real user data.
 
 Administrators use the same login form as regular users and are routed to the
 Admin Console. It supports paginated account viewing, role assignment,
-activation/deactivation, and a recent activity feed. If the bootstrap email
-already belongs to a regular account, startup fails instead of granting
+activation/deactivation, per-account income/expense/balance totals (not
+individual transaction records), and a recent activity feed. If the bootstrap
+email already belongs to a regular account, startup fails instead of granting
 administrator access; choose a fresh email or promote that account manually
 through a trusted database session. Keep the bootstrap password private and do
 not commit it to GitHub.

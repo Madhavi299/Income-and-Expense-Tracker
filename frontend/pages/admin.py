@@ -39,6 +39,9 @@ def _users_tab(token, current_user):
                 "Email": user["email"],
                 "Role": user["role"],
                 "Active": user["is_active"],
+                "Total Income": f'₹{user["total_income"]:,.2f}',
+                "Total Expenses": f'₹{user["total_expenses"]:,.2f}',
+                "Balance": f'₹{user["balance"]:,.2f}',
                 "Created": user["created_at"],
             }
             for user in users

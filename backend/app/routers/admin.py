@@ -1,16 +1,22 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import case, func
 from sqlalchemy.orm import Session, aliased
 
 from backend.app.activity import record_activity
 from backend.app.db.database import get_db
 from backend.app.dependencies import get_current_admin
-from backend.app.models import ActivityLog, User
-from backend.app.schemas import ActivityResponse, AdminUserResponse, AdminUserUpdate
+from backend.app.models import ActivityLog, Transaction, User
+from backend.app.schemas import (
+    ActivityResponse,
+    AdminUserResponse,
+    AdminUserSummary,
+    AdminUserUpdate,
+)
 
 router = APIRouter(prefix="/admin", tags=["Administration"])
 
 
-@router.get("/users", response_model=list[AdminUserResponse])
+@router.get("/users", response_model=list[AdminUserSummary])
 def list_users(
     db: Session = Depends(get_db),
     admin: User = Depends(get_current_admin),
@@ -18,13 +24,49 @@ def list_users(
     offset: int = Query(default=0, ge=0),
 ):
     del admin
-    return (
-        db.query(User)
+    rows = (
+        db.query(
+            User,
+            func.coalesce(
+                func.sum(
+                    case(
+                        (Transaction.transaction_type == "Income", Transaction.amount),
+                        else_=0.0,
+                    )
+                ),
+                0.0,
+            ).label("total_income"),
+            func.coalesce(
+                func.sum(
+                    case(
+                        (Transaction.transaction_type == "Expense", Transaction.amount),
+                        else_=0.0,
+                    )
+                ),
+                0.0,
+            ).label("total_expenses"),
+        )
+        .outerjoin(Transaction, Transaction.user_id == User.id)
+        .group_by(User.id)
         .order_by(User.created_at.desc(), User.id.desc())
         .offset(offset)
         .limit(limit)
         .all()
     )
+    return [
+        AdminUserSummary(
+            id=user.id,
+            username=user.username,
+            email=user.email,
+            role=user.role,
+            is_active=user.is_active,
+            created_at=user.created_at,
+            total_income=total_income,
+            total_expenses=total_expenses,
+            balance=total_income - total_expenses,
+        )
+        for user, total_income, total_expenses in rows
+    ]
 
 
 @router.patch("/users/{user_id}", response_model=AdminUserResponse)
