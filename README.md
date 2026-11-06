@@ -8,7 +8,11 @@ This is a separate project. It does not modify your existing tracker.
 - JWT authentication for the FastAPI backend
 - Each user can see and manage only their own transactions
 - Role-based access for regular users and administrators, including account activation controls and activity monitoring
-- Dashboard, add transaction, view transactions, and manage transactions pages
+- A consistent, interactive app experience with a redesigned sign-in page,
+  light/dark appearance toggle, searchable transaction views, guided CRUD forms,
+  and an administrator console
+- Dashboard with daily/weekly/monthly filters, colored income and expense charts,
+  and interactive cash-flow insights
 - Upload an image/PDF bill, extract text, detect likely amount/date/merchant/category, review the fields, then save to the database
 - PostgreSQL supported; SQLite is the default for a simple first run
 

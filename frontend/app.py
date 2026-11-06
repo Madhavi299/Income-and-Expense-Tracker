@@ -9,6 +9,7 @@ if repository_root not in sys.path:
     sys.path.insert(0, repository_root)
 
 from frontend.api_client import APIError, login, register
+from frontend.theme import render_theme_control
 
 
 # --------------------------------------------------
@@ -37,100 +38,50 @@ def init_state():
 # --------------------------------------------------
 
 def auth_screen():
-
     st.title("💰 Personal Income & Expense Tracker")
+    _, content, _ = st.columns([1, 1.5, 1])
+    with content:
+        st.subheader("Welcome")
+        login_tab, register_tab = st.tabs(["Login", "Create account"])
 
-    st.caption(
-        "Manage income, expenses, and bills in your own secure account."
-    )
-
-    login_tab, register_tab = st.tabs(
-        ["Login", "Create account"]
-    )
-
-    # LOGIN
-    with login_tab:
-
-        with st.form("login_form"):
-
-            email = st.text_input("Email")
-
-            password = st.text_input(
-                "Password",
-                type="password"
-            )
-
-            submitted = st.form_submit_button(
-                "Login",
-                use_container_width=True
-            )
-
-        if submitted:
-
-            try:
-
-                result = login(
-                    email.strip(),
-                    password
+        with login_tab:
+            with st.form("login_form"):
+                email = st.text_input("Email", placeholder="you@example.com")
+                password = st.text_input("Password", type="password")
+                submitted = st.form_submit_button(
+                    "Login", use_container_width=True
                 )
 
-                st.session_state.token = result["access_token"]
-
-                st.session_state.user = result["user"]
-
-                st.rerun()
-
-            except APIError as exc:
-
-                st.error(str(exc))
-
-    # REGISTER
-    with register_tab:
-
-        with st.form("register_form"):
-
-            username = st.text_input("Username")
-
-            email = st.text_input("Email")
-
-            password = st.text_input(
-                "Password (at least 8 characters)",
-                type="password"
-            )
-
-            confirm = st.text_input(
-                "Confirm password",
-                type="password"
-            )
-
-            submitted = st.form_submit_button(
-                "Create account",
-                use_container_width=True
-            )
-
-        if submitted:
-
-            if password != confirm:
-
-                st.error("Passwords do not match.")
-
-            else:
-
+            if submitted:
                 try:
-
-                    register(
-                        username.strip(),
-                        email.strip(),
-                        password
-                    )
-
-                    st.success(
-                        "Account created. Please log in."
-                    )
-
+                    result = login(email.strip(), password)
+                    st.session_state.token = result["access_token"]
+                    st.session_state.user = result["user"]
+                    st.rerun()
                 except APIError as exc:
-
                     st.error(str(exc))
+
+        with register_tab:
+            with st.form("register_form"):
+                username = st.text_input("Username", placeholder="Your name")
+                email = st.text_input("Email", placeholder="you@example.com")
+                password = st.text_input(
+                    "Password (at least 8 characters)", type="password"
+                )
+                confirm = st.text_input("Confirm password", type="password")
+                submitted = st.form_submit_button(
+                    "Create account", use_container_width=True
+                )
+
+            if submitted:
+                if password != confirm:
+                    st.error("Passwords do not match.")
+                else:
+                    try:
+                        register(username.strip(), email.strip(), password)
+                        st.success("Account created. Please log in.")
+                    except APIError as exc:
+                        st.error(str(exc))
 
 
 # --------------------------------------------------
@@ -162,6 +113,7 @@ def app_screen():
                 title="Admin Console",
                 url_path="admin",
                 default=True,
+                icon="🛡️",
             )
         ]
     else:
@@ -175,40 +127,42 @@ def app_screen():
                 title="Dashboard",
                 url_path="dashboard",
                 default=True,
+                icon="📊",
             ),
             st.Page(
                 add_page,
                 title="Add Transaction",
                 url_path="add-transaction",
+                icon="➕",
             ),
             st.Page(
                 view_page,
                 title="View Transactions",
                 url_path="view-transactions",
+                icon="🧾",
             ),
             st.Page(
                 manage_page,
                 title="Manage Transactions",
                 url_path="manage-transactions",
+                icon="⚙️",
             ),
         ]
 
     # SIDEBAR BRANDING
     with st.sidebar:
 
-        st.title("💰 Expense Tracker")
-
-        st.write(
-            f"Logged in as **{user.get('username', 'User')}**"
-        )
-
+        st.markdown("## 💸 Moneywise")
+        st.caption("PERSONAL FINANCE")
         st.divider()
+        st.markdown(f"**{user.get('username', 'User')}**")
+        st.caption(f"Logged in as {user.get('username', 'User')}")
+        st.caption("Administrator" if user.get("role") == "admin" else "Personal account")
 
         if st.button(
-            "Log out",
-            use_container_width=True
+            "Sign out",
+            use_container_width=True,
         ):
-
             logout()
 
     navigation = st.navigation(
@@ -224,18 +178,11 @@ def app_screen():
 # --------------------------------------------------
 
 init_state()
+render_theme_control()
 
 if not st.session_state.token:
-
     navigation = st.navigation(
-        [
-            st.Page(
-                auth_screen,
-                title="Login",
-                url_path="login",
-                default=True,
-            )
-        ],
+        [st.Page(auth_screen, title="Login", default=True)],
         position="hidden",
     )
     navigation.run()
