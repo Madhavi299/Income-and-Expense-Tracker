@@ -65,7 +65,8 @@ def test_add_dashboard_view_and_manage_transactions(
     expect(page.get_by_role("heading", name="📊 Dashboard")).to_be_visible()
     expect(page.get_by_text("₹1,000.00")).to_be_visible()
     expect(page.get_by_text("₹125.00")).to_be_visible()
-    expect(page.get_by_text("₹875.00")).to_be_visible()
+    balance_metric = page.get_by_test_id("stMetric").filter(has_text="Balance")
+    expect(balance_metric).to_contain_text("₹875.00")
     capture_page("dashboard-totals")
 
     page.get_by_role("link", name="View Transactions").click()

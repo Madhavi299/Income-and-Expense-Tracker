@@ -107,7 +107,7 @@ def page():
         income_hover = alt.selection_point(
             on="pointerover", fields=["Type"], empty=True
         )
-        income_expense_chart = (
+        income_expense_donut = (
             alt.Chart(income_expense)
             .mark_arc(innerRadius=66, outerRadius=108, cornerRadius=5, padAngle=0.025)
             .encode(
@@ -135,7 +135,31 @@ def page():
                 ],
             )
             .add_params(income_hover)
-            .properties(height=340, padding={"top": 24, "bottom": 24, "left": 16, "right": 16})
+        )
+        center_title = (
+            alt.Chart(pd.DataFrame({"label": ["BALANCE"]}))
+            .mark_text(fontSize=11, fontWeight=600, color=chart_text)
+            .encode(
+                x=alt.X(value=alt.ExprRef(expr="width / 2")),
+                y=alt.Y(value=alt.ExprRef(expr="height / 2 - 10")),
+                text="label:N",
+            )
+        )
+        center_amount = (
+            alt.Chart(pd.DataFrame({"amount": [f"₹{balance:,.2f}"]}))
+            .mark_text(fontSize=15, fontWeight=700, color=chart_text)
+            .encode(
+                x=alt.X(value=alt.ExprRef(expr="width / 2")),
+                y=alt.Y(value=alt.ExprRef(expr="height / 2 + 12")),
+                text="amount:N",
+            )
+        )
+        income_expense_chart = (
+            alt.layer(income_expense_donut, center_title, center_amount)
+            .properties(
+                height=340,
+                padding={"top": 24, "bottom": 24, "left": 16, "right": 16},
+            )
             .configure(background="transparent")
             .configure_view(stroke=None)
             .configure_legend(
