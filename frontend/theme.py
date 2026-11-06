@@ -13,8 +13,8 @@ def render_theme_control():
         True: {
             "background": "#0b1020",
             "surface": "#111a2e",
-            "foreground": "#e5eaf5",
-            "muted": "#9aa7bf",
+            "foreground": "#f8fafc",
+            "muted": "#c0cadb",
             "border": "#27334b",
             "accent": "#a5b4fc",
             "button_background": "#18243d",
@@ -67,11 +67,39 @@ def render_theme_control():
             color: {colors["foreground"]} !important;
             -webkit-text-fill-color: {colors["foreground"]} !important;
         }}
+        html body [data-testid="stAppViewContainer"] [data-testid="stHeading"] *,
+        html body [data-testid="stAppViewContainer"] h1,
+        html body [data-testid="stAppViewContainer"] h2,
+        html body [data-testid="stAppViewContainer"] h3,
+        html body [data-testid="stAppViewContainer"] h4,
+        html body [data-testid="stAppViewContainer"] h5,
+        html body [data-testid="stAppViewContainer"] h6,
+        html body [data-testid="stAppViewContainer"] h1 *,
+        html body [data-testid="stAppViewContainer"] h2 *,
+        html body [data-testid="stAppViewContainer"] h3 *,
+        html body [data-testid="stAppViewContainer"] h4 *,
+        html body [data-testid="stAppViewContainer"] h5 *,
+        html body [data-testid="stAppViewContainer"] h6 * {{
+            color: {colors["foreground"]} !important;
+            -webkit-text-fill-color: {colors["foreground"]} !important;
+            opacity: 1 !important;
+        }}
         h1, h2, h3, h4, h5, h6 {{
             letter-spacing: -0.035em;
         }}
         [data-testid="stCaptionContainer"] {{
             color: {colors["muted"]} !important;
+        }}
+        [data-testid="stCaptionContainer"] *,
+        [data-testid="stMarkdownContainer"] p,
+        [data-testid="stMarkdownContainer"] li {{
+            color: {colors["muted"]} !important;
+            -webkit-text-fill-color: {colors["muted"]} !important;
+        }}
+        [data-testid="stMarkdownContainer"] strong,
+        [data-testid="stMarkdownContainer"] b {{
+            color: {colors["foreground"]} !important;
+            -webkit-text-fill-color: {colors["foreground"]} !important;
         }}
         div[data-testid="stMetric"] {{
             background: linear-gradient(145deg, {colors["surface"]}, {colors["background"]});
