@@ -136,12 +136,23 @@ def render_theme_control():
         }}
         .stButton > button,
         .stDownloadButton > button,
-        [data-testid="stBaseButton-secondary"] {{
+        [data-testid="stBaseButton-secondary"],
+        [data-testid="stFormSubmitButton"] button,
+        [data-testid="stBaseButton-primary"] {{
             background-color: {colors["button_background"]};
-            color: {colors["foreground"]};
+            color: {colors["foreground"]} !important;
+            -webkit-text-fill-color: {colors["foreground"]} !important;
             border-color: {colors["border"]};
             border-radius: 10px;
             transition: all 150ms ease;
+        }}
+        .stButton > button *,
+        .stDownloadButton > button *,
+        [data-testid="stBaseButton-secondary"] *,
+        [data-testid="stFormSubmitButton"] button *,
+        [data-testid="stBaseButton-primary"] * {{
+            color: inherit !important;
+            -webkit-text-fill-color: inherit !important;
         }}
         .stButton > button:hover,
         .stDownloadButton > button:hover {{
@@ -152,11 +163,17 @@ def render_theme_control():
         [data-testid="stFormSubmitButton"] button,
         [data-testid="stBaseButton-primary"] {{
             background: linear-gradient(100deg, #4f46e5, #7c3aed);
-            color: #ffffff;
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
             border: none;
             border-radius: 10px;
             font-weight: 650;
             transition: all 150ms ease;
+        }}
+        [data-testid="stFormSubmitButton"] button *,
+        [data-testid="stBaseButton-primary"] * {{
+            color: #ffffff !important;
+            -webkit-text-fill-color: #ffffff !important;
         }}
         [data-testid="stFormSubmitButton"] button:hover,
         [data-testid="stBaseButton-primary"]:hover {{
