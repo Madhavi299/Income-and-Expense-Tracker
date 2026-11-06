@@ -39,9 +39,6 @@ def _users_tab(token, current_user):
                 "Email": user["email"],
                 "Role": user["role"],
                 "Active": user["is_active"],
-                "Total Income": f'₹{user["total_income"]:,.2f}',
-                "Total Expenses": f'₹{user["total_expenses"]:,.2f}',
-                "Balance": f'₹{user["balance"]:,.2f}',
                 "Created": user["created_at"],
             }
             for user in users
@@ -56,6 +53,12 @@ def _users_tab(token, current_user):
     }
     selected = st.selectbox("Select an account to manage", list(choices))
     user = choices[selected]
+    st.subheader(f'Financial summary for {user["username"]}')
+    income, expenses, balance = st.columns(3)
+    income.metric("Total Income", f'₹{user["total_income"]:,.2f}')
+    expenses.metric("Total Expenses", f'₹{user["total_expenses"]:,.2f}')
+    balance.metric("Balance", f'₹{user["balance"]:,.2f}')
+
     is_self = user["id"] == current_user["id"]
     with st.form("admin_user_update"):
         role = st.selectbox(
